@@ -207,6 +207,134 @@ function getTabletPriceBuckets() {
   return buckets;
 }
 
+// --- Computer Accessories Filter Sidebar Logic ---
+const ACCESSORY_FILTERS: { [key: string]: { label: string, key: string }[] } = {
+  monitors: [
+    { label: 'Display Size', key: 'Display Size' },
+    { label: 'Resolution', key: 'Resolution' },
+    { label: 'Panel Type', key: 'Panel Type' },
+    { label: 'Refresh Rate', key: 'Refresh Rate' },
+    { label: 'Connectivity', key: 'Connectivity' },
+    { label: 'Other', key: 'Other' },
+  ],
+  'keyboards-mice': [
+    { label: 'Type', key: 'Type' },
+    { label: 'Connectivity', key: 'Connectivity' },
+    { label: 'Other', key: 'Other' },
+  ],
+  storage: [
+    { label: 'Capacity', key: 'Capacity' },
+    { label: 'Type', key: 'Type' },
+    { label: 'Interface', key: 'Interface' },
+    { label: 'Other', key: 'Other' },
+  ],
+  hubs: [
+    { label: 'Type', key: 'Type' },
+    { label: 'Connectivity', key: 'Connectivity' },
+    { label: 'Other', key: 'Other' },
+  ],
+  routers: [
+    { label: 'Type', key: 'Type' },
+    { label: 'Connectivity', key: 'Connectivity' },
+    { label: 'Other', key: 'Other' },
+  ],
+};
+
+function getAccessoryBrands(subcat: string) {
+  const brands = new Set<string>();
+  SAMPLE_PRODUCTS.filter(p => p.category === 'computer-accessories' && p.subcategory === subcat).forEach(p => {
+    if (p.specifications?.Brand) brands.add(p.specifications.Brand);
+  });
+  return Array.from(brands);
+}
+
+function getAccessorySuppliers(subcat: string) {
+  const suppliers = new Map<string, Supplier>();
+  SAMPLE_PRODUCTS.filter(p => p.category === 'computer-accessories' && p.subcategory === subcat).forEach(p => {
+    suppliers.set(p.supplier.id, p.supplier);
+  });
+  return Array.from(suppliers.values());
+}
+
+function getAccessoryPriceBuckets(subcat: string) {
+  const products = SAMPLE_PRODUCTS.filter(p => p.category === 'computer-accessories' && p.subcategory === subcat);
+  if (products.length === 0) return [];
+  const prices = products.flatMap(p => p.moqTiers.map(t => t.pricePerUnit));
+  const min = Math.min(...prices);
+  const max = Math.max(...prices);
+  const step = Math.ceil((max - min) / 4) || 1;
+  let buckets = [];
+  for (let i = 0; i < 4; i++) {
+    const from = min + i * step;
+    const to = i === 3 ? Infinity : min + (i + 1) * step;
+    buckets.push({ label: i === 3 ? `KES ${from.toLocaleString()}+` : `KES ${from.toLocaleString()} - ${to.toLocaleString()}`, min: from, max: to });
+  }
+  return buckets;
+}
+
+// --- Network Hardware Filter Sidebar Logic ---
+const NETWORK_HARDWARE_FILTERS: { [key: string]: { label: string, key: string }[] } = {
+  routers: [
+    { label: 'Device Type', key: 'Device Type' },
+    { label: 'Ports/Speed', key: 'Ports/Speed' },
+    { label: 'Wireless Standard', key: 'Wireless Standard' },
+    { label: 'Coverage', key: 'Coverage' },
+    { label: 'Management', key: 'Management' },
+    { label: 'Other', key: 'Other' },
+  ],
+  switches: [
+    { label: 'Device Type', key: 'Device Type' },
+    { label: 'Ports/Speed', key: 'Ports/Speed' },
+    { label: 'Management', key: 'Management' },
+    { label: 'Other', key: 'Other' },
+  ],
+  modems: [
+    { label: 'Device Type', key: 'Device Type' },
+    { label: 'Ports/Speed', key: 'Ports/Speed' },
+    { label: 'Standard', key: 'Standard' },
+    { label: 'Other', key: 'Other' },
+  ],
+  'access-points': [
+    { label: 'Device Type', key: 'Device Type' },
+    { label: 'Wireless Standard', key: 'Wireless Standard' },
+    { label: 'Coverage', key: 'Coverage' },
+    { label: 'Management', key: 'Management' },
+    { label: 'Other', key: 'Other' },
+  ],
+};
+
+function getNetworkHardwareBrands(subcat: string) {
+  const brands = new Set<string>();
+  SAMPLE_PRODUCTS.filter(p => p.category === 'network-hardware' && p.subcategory === subcat).forEach(p => {
+    if (p.specifications?.Brand) brands.add(p.specifications.Brand);
+  });
+  return Array.from(brands);
+}
+
+function getNetworkHardwareSuppliers(subcat: string) {
+  const suppliers = new Map<string, Supplier>();
+  SAMPLE_PRODUCTS.filter(p => p.category === 'network-hardware' && p.subcategory === subcat).forEach(p => {
+    suppliers.set(p.supplier.id, p.supplier);
+  });
+  return Array.from(suppliers.values());
+}
+
+function getNetworkHardwarePriceBuckets(subcat: string) {
+  const products = SAMPLE_PRODUCTS.filter(p => p.category === 'network-hardware' && p.subcategory === subcat);
+  if (products.length === 0) return [];
+  const prices = products.flatMap(p => p.moqTiers.map(t => t.pricePerUnit));
+  const min = Math.min(...prices);
+  const max = Math.max(...prices);
+  const step = Math.ceil((max - min) / 4) || 1;
+  let buckets = [];
+  for (let i = 0; i < 4; i++) {
+    const from = min + i * step;
+    const to = i === 3 ? Infinity : min + (i + 1) * step;
+    buckets.push({ label: i === 3 ? `KES ${from.toLocaleString()}+` : `KES ${from.toLocaleString()} - ${to.toLocaleString()}`, min: from, max: to });
+  }
+  return buckets;
+}
+
 export default function ProductsPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -473,6 +601,139 @@ export default function ProductsPage() {
     return filtered;
   }, [SAMPLE_PRODUCTS, tabletPrice, tabletPriceBucket, tabletBrand, tabletSupplier, tabletFilters, tabletKeywords, selectedCategory, selectedSubcategory]);
 
+  // --- Filter State for Accessories ---
+  const [accessoryPrice, setAccessoryPrice] = useState({ min: '', max: '' });
+  const [accessoryPriceBucket, setAccessoryPriceBucket] = useState('');
+  const [accessoryBrand, setAccessoryBrand] = useState('');
+  const [accessorySupplier, setAccessorySupplier] = useState('');
+  const [accessoryFilters, setAccessoryFilters] = useState<{ [key: string]: Set<string> }>({});
+  const [accessoryKeywords, setAccessoryKeywords] = useState('');
+
+  // Reset accessory filters on subcategory change
+  useEffect(() => {
+    setAccessoryPrice({ min: '', max: '' });
+    setAccessoryPriceBucket('');
+    setAccessoryBrand('');
+    setAccessorySupplier('');
+    setAccessoryFilters({});
+    setAccessoryKeywords('');
+  }, [selectedCategory, selectedSubcategory]);
+
+  // --- Filtering Logic for Accessories ---
+  const accessoriesToShow = useMemo(() => {
+    if (!selectedSubcategory) return [];
+    let filtered = SAMPLE_PRODUCTS.filter(p => p.category === 'computer-accessories' && p.subcategory === selectedSubcategory);
+    // Price
+    if (accessoryPrice.min) filtered = filtered.filter(p => Math.min(...p.moqTiers.map(t => t.pricePerUnit)) >= Number(accessoryPrice.min));
+    if (accessoryPrice.max) filtered = filtered.filter(p => Math.max(...p.moqTiers.map(t => t.pricePerUnit)) <= Number(accessoryPrice.max));
+    if (accessoryPriceBucket) {
+      const bucket = getAccessoryPriceBuckets(selectedSubcategory).find(b => b.label === accessoryPriceBucket);
+      if (bucket) {
+        filtered = filtered.filter(p => {
+          const minP = Math.min(...p.moqTiers.map(t => t.pricePerUnit));
+          return minP >= bucket.min && minP < bucket.max;
+        });
+      }
+    }
+    // Brand
+    if (accessoryBrand) {
+      filtered = filtered.filter(p => p.specifications?.Brand?.toLowerCase() === accessoryBrand.toLowerCase());
+    }
+    // Supplier
+    if (accessorySupplier) {
+      filtered = filtered.filter(p => p.supplier.id === accessorySupplier);
+    }
+    // Feature filters
+    const filters = ACCESSORY_FILTERS[selectedSubcategory] || [];
+    Object.entries(accessoryFilters).forEach(([section, values]) => {
+      if (values.size > 0) {
+        filtered = filtered.filter(p => {
+          return Array.from(values).some(val => {
+            const spec = p.specifications?.[section] || '';
+            return spec.toLowerCase().includes(val.toLowerCase());
+          });
+        });
+      }
+    });
+    // Keywords
+    if (accessoryKeywords.trim()) {
+      const kw = accessoryKeywords.trim().toLowerCase();
+      filtered = filtered.filter(p =>
+        p.name.toLowerCase().includes(kw) ||
+        p.description?.toLowerCase().includes(kw) ||
+        Object.values(p.specifications).some(spec => spec.toLowerCase().includes(kw)) ||
+        p.tags.some(tag => tag.toLowerCase().includes(kw))
+      );
+    }
+    return filtered;
+  }, [SAMPLE_PRODUCTS, accessoryPrice, accessoryPriceBucket, accessoryBrand, accessorySupplier, accessoryFilters, accessoryKeywords, selectedCategory, selectedSubcategory]);
+
+  // --- Filter State for Network Hardware ---
+  const [networkPrice, setNetworkPrice] = useState({ min: '', max: '' });
+  const [networkPriceBucket, setNetworkPriceBucket] = useState('');
+  const [networkBrand, setNetworkBrand] = useState('');
+  const [networkSupplier, setNetworkSupplier] = useState('');
+  const [networkFilters, setNetworkFilters] = useState<{ [key: string]: Set<string> }>({});
+  const [networkKeywords, setNetworkKeywords] = useState('');
+
+  // Reset on category/subcategory change
+  useEffect(() => {
+    setNetworkPrice({ min: '', max: '' });
+    setNetworkPriceBucket('');
+    setNetworkBrand('');
+    setNetworkSupplier('');
+    setNetworkFilters({});
+    setNetworkKeywords('');
+  }, [selectedCategory, selectedSubcategory]);
+
+  // --- Filtering Logic for Network Hardware ---
+  const networkHardwareToShow = useMemo(() => {
+    if (!selectedSubcategory) return [];
+    let filtered = SAMPLE_PRODUCTS.filter(p => p.category === 'network-hardware' && p.subcategory === selectedSubcategory);
+    // Price
+    if (networkPrice.min) filtered = filtered.filter(p => Math.min(...p.moqTiers.map(t => t.pricePerUnit)) >= Number(networkPrice.min));
+    if (networkPrice.max) filtered = filtered.filter(p => Math.max(...p.moqTiers.map(t => t.pricePerUnit)) <= Number(networkPrice.max));
+    if (networkPriceBucket) {
+      const bucket = getNetworkHardwarePriceBuckets(selectedSubcategory).find(b => b.label === networkPriceBucket);
+      if (bucket) {
+        filtered = filtered.filter(p => {
+          const minP = Math.min(...p.moqTiers.map(t => t.pricePerUnit));
+          return minP >= bucket.min && minP < bucket.max;
+        });
+      }
+    }
+    // Brand
+    if (networkBrand) {
+      filtered = filtered.filter(p => p.specifications?.Brand?.toLowerCase() === networkBrand.toLowerCase());
+    }
+    // Supplier
+    if (networkSupplier) {
+      filtered = filtered.filter(p => p.supplier.id === networkSupplier);
+    }
+    // Feature filters
+    Object.entries(networkFilters).forEach(([section, values]) => {
+      if (values.size > 0) {
+        filtered = filtered.filter(p => {
+          return Array.from(values).some(val => {
+            const spec = p.specifications?.[section] || '';
+            return spec.toLowerCase().includes(val.toLowerCase());
+          });
+        });
+      }
+    });
+    // Keywords
+    if (networkKeywords.trim()) {
+      const kw = networkKeywords.trim().toLowerCase();
+      filtered = filtered.filter(p =>
+        p.name.toLowerCase().includes(kw) ||
+        p.description?.toLowerCase().includes(kw) ||
+        Object.values(p.specifications).some(spec => spec.toLowerCase().includes(kw)) ||
+        p.tags.some(tag => tag.toLowerCase().includes(kw))
+      );
+    }
+    return filtered;
+  }, [SAMPLE_PRODUCTS, networkPrice, networkPriceBucket, networkBrand, networkSupplier, networkFilters, networkKeywords, selectedCategory, selectedSubcategory]);
+
   // --- Sidebar UI for Mobile Phones ---
   function MobilePhonesSidebar() {
     const brands = getMobileBrands();
@@ -488,7 +749,7 @@ export default function ProductsPage() {
       ));
     });
   return (
-      <div className="bg-white/95 rounded-2xl shadow-xl border-0 card-hover p-0">
+      <div className="bg-white/95 rounded-2xl shadow-xl border-0 card-hover p-0 max-h-[calc(100vh-7rem)] overflow-y-auto">
         <div className="p-8 space-y-8">
           {/* Price */}
           <div>
@@ -590,7 +851,7 @@ export default function ProductsPage() {
       ));
     });
     return (
-      <div className="bg-white/95 rounded-2xl shadow-xl border-0 card-hover p-0">
+      <div className="bg-white/95 rounded-2xl shadow-xl border-0 card-hover p-0 max-h-[calc(100vh-7rem)] overflow-y-auto">
         <div className="p-8 space-y-8">
           {/* Price */}
           <div>
@@ -677,14 +938,14 @@ export default function ProductsPage() {
           <div>
             <div className="font-bold text-lg mb-3">Other Features / Keywords</div>
             <input
-              type="text"
+                  type="text"
               className="w-full rounded-lg border-blue-100 px-3 py-2 text-base"
               placeholder="e.g. Touchscreen, Backlit Keyboard, Fingerprint"
               value={laptopKeywords}
               onChange={e => setLaptopKeywords(e.target.value)}
-            />
-          </div>
-        </div>
+                />
+              </div>
+            </div>
       </div>
     );
   }
@@ -704,7 +965,7 @@ export default function ProductsPage() {
       ));
     });
     return (
-      <div className="bg-white/95 rounded-2xl shadow-xl border-0 card-hover p-0">
+      <div className="bg-white/95 rounded-2xl shadow-xl border-0 card-hover p-0 max-h-[calc(100vh-7rem)] overflow-y-auto">
         <div className="p-8 space-y-8">
           {/* Price */}
           <div>
@@ -712,7 +973,7 @@ export default function ProductsPage() {
             <div className="flex gap-2 mb-3">
               <input type="number" placeholder="min" className="w-1/2 rounded-lg border-blue-100 px-3 py-2 text-base" value={cpuPrice.min} onChange={e => setCPUPrice(p => ({ ...p, min: e.target.value }))} />
               <input type="number" placeholder="max" className="w-1/2 rounded-lg border-blue-100 px-3 py-2 text-base" value={cpuPrice.max} onChange={e => setCPUPrice(p => ({ ...p, max: e.target.value }))} />
-            </div>
+              </div>
             <div className="space-y-2">
               {priceBuckets.map((bucket, i) => (
                 <label key={i} className="flex items-center gap-2 cursor-pointer">
@@ -724,8 +985,8 @@ export default function ProductsPage() {
             <div className="flex justify-between mt-2 text-xs text-blue-500">
               <button className="hover:underline" onClick={() => { setCPUPrice({ min: '', max: '' }); setCPUPriceBucket(''); }}>CLEAR</button>
               <button className="hover:underline text-green-600 font-bold" onClick={() => {}}>SAVE</button>
-            </div>
           </div>
+            </div>
           <hr className="my-4 border-blue-50" />
           {/* Brand */}
           <div>
@@ -741,8 +1002,8 @@ export default function ProductsPage() {
                   <span className="text-base font-semibold">{brand}</span>
                 </label>
               ))}
-            </div>
-                </div>
+        </div>
+          </div>
           <hr className="my-4 border-blue-50" />
           {/* Feature Filters */}
           {CPU_FILTERS.map(f => (
@@ -818,10 +1079,10 @@ export default function ProductsPage() {
       ));
     });
     return (
-      <div className="bg-white/95 rounded-2xl shadow-xl border-0 card-hover p-0">
+      <div className="bg-white/95 rounded-2xl shadow-xl border-0 card-hover p-0 max-h-[calc(100vh-7rem)] overflow-y-auto">
         <div className="p-8 space-y-8">
           {/* Price */}
-          <div>
+              <div>
             <div className="font-bold text-lg mb-3">Price, KSh</div>
             <div className="flex gap-2 mb-3">
               <input type="number" placeholder="min" className="w-1/2 rounded-lg border-blue-100 px-3 py-2 text-base" value={tabletPrice.min} onChange={e => setTabletPrice(p => ({ ...p, min: e.target.value }))} />
@@ -917,6 +1178,238 @@ export default function ProductsPage() {
     );
   }
 
+  // --- Sidebar UI for Accessories ---
+  function AccessoriesSidebar() {
+    if (!selectedSubcategory) return null;
+    const brands = getAccessoryBrands(selectedSubcategory);
+    const suppliers = getAccessorySuppliers(selectedSubcategory);
+    const priceBuckets = getAccessoryPriceBuckets(selectedSubcategory);
+    const filters = ACCESSORY_FILTERS[selectedSubcategory] || [];
+    // Get unique options for each filter
+    const filterOptions: { [key: string]: string[] } = {};
+    filters.forEach(f => {
+      filterOptions[f.key] = Array.from(new Set(
+        SAMPLE_PRODUCTS.filter(p => p.category === 'computer-accessories' && p.subcategory === selectedSubcategory)
+          .map(p => p.specifications?.[f.key] || '')
+          .filter(Boolean)
+      ));
+    });
+    return (
+      <div className="bg-white/95 rounded-2xl shadow-xl border-0 card-hover p-0 max-h-[calc(100vh-7rem)] overflow-y-auto">
+        <div className="p-8 space-y-8">
+          {/* Price */}
+          <div>
+            <div className="font-bold text-lg mb-3">Price, KSh</div>
+            <div className="flex gap-2 mb-3">
+              <input type="number" placeholder="min" className="w-1/2 rounded-lg border-blue-100 px-3 py-2 text-base" value={accessoryPrice.min} onChange={e => setAccessoryPrice(p => ({ ...p, min: e.target.value }))} />
+              <input type="number" placeholder="max" className="w-1/2 rounded-lg border-blue-100 px-3 py-2 text-base" value={accessoryPrice.max} onChange={e => setAccessoryPrice(p => ({ ...p, max: e.target.value }))} />
+              </div>
+            <div className="space-y-2">
+              {priceBuckets.map((bucket, i) => (
+                <label key={i} className="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="accessory-price-bucket" className="accent-blue-600" checked={accessoryPriceBucket === bucket.label} onChange={() => setAccessoryPriceBucket(bucket.label)} />
+                  <span className="text-gray-700 text-base">{bucket.label}</span>
+                </label>
+              ))}
+            </div>
+            <div className="flex justify-between mt-2 text-xs text-blue-500">
+              <button className="hover:underline" onClick={() => { setAccessoryPrice({ min: '', max: '' }); setAccessoryPriceBucket(''); }}>CLEAR</button>
+              <button className="hover:underline text-green-600 font-bold" onClick={() => {}}>SAVE</button>
+            </div>
+          </div>
+          <hr className="my-4 border-blue-50" />
+          {/* Brand */}
+          <div>
+            <div className="font-bold text-lg mb-3">Brand</div>
+            <div className="space-y-2">
+              <label className="flex items-center gap-2 cursor-pointer text-green-600">
+                <input type="radio" name="accessory-brand" className="accent-green-600" checked={accessoryBrand === ''} onChange={() => setAccessoryBrand('')} />
+                <span className="text-base font-semibold">Show all</span>
+              </label>
+              {brands.map(brand => (
+                <label key={brand} className="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="accessory-brand" className="accent-blue-600" checked={accessoryBrand === brand} onChange={() => setAccessoryBrand(brand)} />
+                  <span className="text-base font-semibold">{brand}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+          <hr className="my-4 border-blue-50" />
+          {/* Feature Filters */}
+          {filters.map(f => (
+            <div key={f.key}>
+              <div className="font-bold text-lg mb-3">{f.label}</div>
+              <div className="flex flex-wrap gap-2">
+                {filterOptions[f.key].map(opt => (
+                  <label key={opt} className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={accessoryFilters[f.key]?.has(opt) || false}
+                      onChange={e => {
+                        setAccessoryFilters(prev => {
+                          const set = new Set(prev[f.key] || []);
+                          if (e.target.checked) set.add(opt); else set.delete(opt);
+                          return { ...prev, [f.key]: set };
+                        });
+                      }}
+                      className="accent-blue-600"
+                    />
+                    <span className="text-gray-700 text-base">{opt}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          ))}
+          <hr className="my-4 border-blue-50" />
+          {/* Supplier */}
+          <div>
+            <div className="font-bold text-lg mb-3">Supplier</div>
+            <div className="space-y-2">
+              <label className="flex items-center gap-2 cursor-pointer text-green-600">
+                <input type="radio" name="accessory-supplier" className="accent-green-600" checked={accessorySupplier === ''} onChange={() => setAccessorySupplier('')} />
+                <span className="text-base font-semibold">Show all</span>
+              </label>
+              {suppliers.map(supplier => (
+                <label key={supplier.id} className="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="accessory-supplier" className="accent-blue-600" checked={accessorySupplier === supplier.id} onChange={() => setAccessorySupplier(supplier.id)} />
+                  <span className="text-base font-semibold">{supplier.name}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+          <hr className="my-4 border-blue-50" />
+          {/* Keywords */}
+          <div>
+            <div className="font-bold text-lg mb-3">Other Features / Keywords</div>
+            <input
+              type="text"
+              className="w-full rounded-lg border-blue-100 px-3 py-2 text-base"
+              placeholder="e.g. Wireless, SSD, HDMI, Ergonomic"
+              value={accessoryKeywords}
+              onChange={e => setAccessoryKeywords(e.target.value)}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // --- Sidebar UI for Network Hardware ---
+  function NetworkHardwareSidebar() {
+    if (!selectedSubcategory) return null;
+    const brands = getNetworkHardwareBrands(selectedSubcategory);
+    const suppliers = getNetworkHardwareSuppliers(selectedSubcategory);
+    const priceBuckets = getNetworkHardwarePriceBuckets(selectedSubcategory);
+    const filters = NETWORK_HARDWARE_FILTERS[selectedSubcategory] || [];
+    // Get unique options for each filter
+    const filterOptions: { [key: string]: string[] } = {};
+    filters.forEach(f => {
+      filterOptions[f.key] = Array.from(new Set(
+        SAMPLE_PRODUCTS.filter(p => p.category === 'network-hardware' && p.subcategory === selectedSubcategory)
+          .map(p => p.specifications?.[f.key] || '')
+          .filter(Boolean)
+      ));
+    });
+    return (
+      <div className="bg-white/95 rounded-2xl shadow-xl border-0 card-hover p-0 max-h-[calc(100vh-7rem)] overflow-y-auto">
+        <div className="p-8 space-y-8">
+          {/* Price */}
+          <div>
+            <div className="font-bold text-lg mb-3">Price, KSh</div>
+            <div className="flex gap-2 mb-3">
+              <input type="number" placeholder="min" className="w-1/2 rounded-lg border-blue-100 px-3 py-2 text-base" value={networkPrice.min} onChange={e => setNetworkPrice(p => ({ ...p, min: e.target.value }))} />
+              <input type="number" placeholder="max" className="w-1/2 rounded-lg border-blue-100 px-3 py-2 text-base" value={networkPrice.max} onChange={e => setNetworkPrice(p => ({ ...p, max: e.target.value }))} />
+                </div>
+            <div className="space-y-2">
+              {priceBuckets.map((bucket, i) => (
+                <label key={i} className="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="network-price-bucket" className="accent-blue-600" checked={networkPriceBucket === bucket.label} onChange={() => setNetworkPriceBucket(bucket.label)} />
+                  <span className="text-gray-700 text-base">{bucket.label}</span>
+                </label>
+              ))}
+            </div>
+            <div className="flex justify-between mt-2 text-xs text-blue-500">
+              <button className="hover:underline" onClick={() => { setNetworkPrice({ min: '', max: '' }); setNetworkPriceBucket(''); }}>CLEAR</button>
+              <button className="hover:underline text-green-600 font-bold" onClick={() => {}}>SAVE</button>
+            </div>
+          </div>
+          <hr className="my-4 border-blue-50" />
+          {/* Brand */}
+          <div>
+            <div className="font-bold text-lg mb-3">Brand</div>
+            <div className="space-y-2">
+              <label className="flex items-center gap-2 cursor-pointer text-green-600">
+                <input type="radio" name="network-brand" className="accent-green-600" checked={networkBrand === ''} onChange={() => setNetworkBrand('')} />
+                <span className="text-base font-semibold">Show all</span>
+              </label>
+              {brands.map(brand => (
+                <label key={brand} className="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="network-brand" className="accent-blue-600" checked={networkBrand === brand} onChange={() => setNetworkBrand(brand)} />
+                  <span className="text-base font-semibold">{brand}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+          <hr className="my-4 border-blue-50" />
+          {/* Feature Filters */}
+          {filters.map(f => (
+            <div key={f.key}>
+              <div className="font-bold text-lg mb-3">{f.label}</div>
+              <div className="flex flex-wrap gap-2">
+                {filterOptions[f.key].map(opt => (
+                  <label key={opt} className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={networkFilters[f.key]?.has(opt) || false}
+                      onChange={e => {
+                        setNetworkFilters(prev => {
+                          const set = new Set(prev[f.key] || []);
+                          if (e.target.checked) set.add(opt); else set.delete(opt);
+                          return { ...prev, [f.key]: set };
+                        });
+                      }}
+                      className="accent-blue-600"
+                    />
+                    <span className="text-gray-700 text-base">{opt}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          ))}
+          <hr className="my-4 border-blue-50" />
+          {/* Supplier */}
+          <div>
+            <div className="font-bold text-lg mb-3">Supplier</div>
+            <div className="space-y-2">
+              <label className="flex items-center gap-2 cursor-pointer text-green-600">
+                <input type="radio" name="network-supplier" className="accent-green-600" checked={networkSupplier === ''} onChange={() => setNetworkSupplier('')} />
+                <span className="text-base font-semibold">Show all</span>
+              </label>
+              {suppliers.map(supplier => (
+                <label key={supplier.id} className="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="network-supplier" className="accent-blue-600" checked={networkSupplier === supplier.id} onChange={() => setNetworkSupplier(supplier.id)} />
+                  <span className="text-base font-semibold">{supplier.name}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+          <hr className="my-4 border-blue-50" />
+          {/* Keywords */}
+          <div>
+            <div className="font-bold text-lg mb-3">Other Features / Keywords</div>
+            <input
+              type="text"
+              className="w-full rounded-lg border-blue-100 px-3 py-2 text-base"
+              placeholder="e.g. PoE, Mesh, Dual Band, Security"
+              value={networkKeywords}
+              onChange={e => setNetworkKeywords(e.target.value)}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // --- Determine which products to show and grid content ---
   let gridContent: React.ReactNode = null;
   if (selectedCategory === 'computers' && selectedSubcategory === 'laptops') {
@@ -926,8 +1419,8 @@ export default function ProductsPage() {
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
         {laptopsToShow.map(product => (
           <ProductCard key={product.id} product={product} />
-        ))}
-      </div>
+                ))}
+              </div>
     );
   } else if (selectedCategory === 'computers' && selectedSubcategory === 'cpus') {
     gridContent = cpusToShow.length === 0 ? (
@@ -937,7 +1430,7 @@ export default function ProductsPage() {
         {cpusToShow.map(product => (
           <ProductCard key={product.id} product={product} />
         ))}
-      </div>
+          </div>
     );
   } else if (selectedCategory === 'mobile-phones') {
     gridContent = productsToShow.length === 0 ? (
@@ -947,7 +1440,7 @@ export default function ProductsPage() {
         {productsToShow.map(product => (
           <ProductCard key={product.id} product={product} />
         ))}
-      </div>
+        </div>
     );
   } else if (selectedCategory === 'computers' && selectedSubcategory === 'tablets') {
     gridContent = tabletsToShow.length === 0 ? (
@@ -955,6 +1448,26 @@ export default function ProductsPage() {
     ) : (
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
         {tabletsToShow.map(product => (
+          <ProductCard key={product.id} product={product} />
+        ))}
+      </div>
+    );
+  } else if (selectedCategory === 'computer-accessories' && selectedSubcategory) {
+    gridContent = accessoriesToShow.length === 0 ? (
+      <div className="col-span-full text-center text-gray-500 text-xl font-medium py-24">No products found.</div>
+    ) : (
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+        {accessoriesToShow.map(product => (
+          <ProductCard key={product.id} product={product} />
+        ))}
+      </div>
+    );
+  } else if (selectedCategory === 'network-hardware' && selectedSubcategory) {
+    gridContent = networkHardwareToShow.length === 0 ? (
+      <div className="col-span-full text-center text-gray-500 text-xl font-medium py-24">No products found.</div>
+    ) : (
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+        {networkHardwareToShow.map(product => (
           <ProductCard key={product.id} product={product} />
         ))}
       </div>
@@ -1005,29 +1518,39 @@ export default function ProductsPage() {
             )}
           </div>
         </div>
-        <div className="grid md:grid-cols-5 gap-12 mb-8">
+        <div className="grid md:grid-cols-[18rem_1fr] gap-12 mb-8 items-start w-full">
           {/* Sidebar for mobile-phones only */}
           {selectedCategory === 'mobile-phones' && (
-            <aside className="md:col-span-1 sticky top-28 self-start z-10">
+            <aside className="w-full md:w-72 shrink-0 sticky top-28 self-start z-10">
               <MobilePhonesSidebar />
             </aside>
           )}
           {selectedCategory === 'computers' && selectedSubcategory === 'laptops' && (
-            <aside className="md:col-span-1 sticky top-28 self-start z-10">
+            <aside className="w-full md:w-72 shrink-0 sticky top-28 self-start z-10">
               <LaptopsSidebar />
             </aside>
           )}
           {selectedCategory === 'computers' && selectedSubcategory === 'cpus' && (
-            <aside className="md:col-span-1 sticky top-28 self-start z-10">
+            <aside className="w-full md:w-72 shrink-0 sticky top-28 self-start z-10">
               <CPUsSidebar />
             </aside>
           )}
           {selectedCategory === 'computers' && selectedSubcategory === 'tablets' && (
-            <aside className="md:col-span-1 sticky top-28 self-start z-10">
+            <aside className="w-full md:w-72 shrink-0 sticky top-28 self-start z-10">
               <TabletsSidebar />
             </aside>
           )}
-          <div className={selectedCategory === 'mobile-phones' ? 'md:col-span-4' : selectedCategory === 'computers' && selectedSubcategory === 'laptops' ? 'md:col-span-4' : selectedCategory === 'computers' && selectedSubcategory === 'cpus' ? 'md:col-span-4' : selectedCategory === 'computers' && selectedSubcategory === 'tablets' ? 'md:col-span-4' : 'md:col-span-5'}>
+          {selectedCategory === 'computer-accessories' && selectedSubcategory && (
+            <aside className="w-full md:w-72 shrink-0 sticky top-28 self-start z-10">
+              <AccessoriesSidebar />
+            </aside>
+          )}
+          {selectedCategory === 'network-hardware' && selectedSubcategory && (
+            <aside className="w-full md:w-72 shrink-0 sticky top-28 self-start z-10">
+              <NetworkHardwareSidebar />
+            </aside>
+          )}
+          <div className="flex-1 min-w-0 w-full">
             {gridContent}
           </div>
         </div>

@@ -219,14 +219,13 @@ export const SAMPLE_PRODUCTS: Product[] = [
     ],
     description: 'Dual-band WiFi router with AC1200 speeds, perfect for small to medium businesses. Easy setup with mobile app management.',
     specifications: {
-      'WiFi Speed': 'AC1200 (300Mbps + 867Mbps)',
-      'Frequency': '2.4GHz + 5GHz',
-      'Antennas': '4 x External',
-      'Ethernet Ports': '4 x 10/100Mbps',
-      'WAN Port': '1 x 10/100Mbps',
-      'Security': 'WPA3, WPA2, WPS',
-      'Management': 'Web Interface + Mobile App',
-      'Coverage': 'Up to 150m²'
+      'Brand': 'TP-Link',
+      'Device Type': 'Router',
+      'Ports/Speed': '4x 10/100Mbps LAN',
+      'Wireless Standard': 'AC1200 (300Mbps + 867Mbps)',
+      'Coverage': 'Up to 150m²',
+      'Management': 'Web Interface, Mobile App',
+      'Other': 'Dual Band, WPA3, 4x External Antennas'
     },
     certifications: ['CE', 'FCC', 'IC', 'RoHS'],
     rating: 4.3,
@@ -1038,11 +1037,11 @@ export const SAMPLE_PRODUCTS: Product[] = [
     tradeTerms: ['FOB'],
     paymentTerms: ['T/T', 'L/C'],
     specifications: {
-      'Ports': '24',
-      'Speed': '1000Mbps',
-      'Power': '100W',
-      'Form Factor': '1U',
-      'Certifications': 'CE, FCC, RoHS'
+      'Brand': 'Cisco',
+      'Device Type': 'Switch',
+      'Ports/Speed': '24x 10/100/1000Mbps',
+      'Management': 'Web Interface, CLI',
+      'Other': '1U Rackmount, CE Certified'
     },
     shippingMethods: ['Air Express', 'Sea Freight']
   },
@@ -1066,10 +1065,12 @@ export const SAMPLE_PRODUCTS: Product[] = [
     tradeTerms: ['CIF'],
     paymentTerms: ['T/T', 'PayPal'],
     specifications: {
-      'Wireless': '2.4GHz + 5GHz',
-      'Ports': '4',
-      'Power': '10W',
-      'Certifications': 'CE, FCC, RoHS'
+      'Brand': 'Ubiquiti',
+      'Device Type': 'Access Point',
+      'Wireless Standard': 'WiFi 6',
+      'Coverage': 'Up to 300m²',
+      'Management': 'Web Interface, App',
+      'Other': 'PoE, Mesh Capable'
     },
     shippingMethods: ['Air Express', 'Sea Freight']
   },
@@ -1093,10 +1094,13 @@ export const SAMPLE_PRODUCTS: Product[] = [
     tradeTerms: ['FOB'],
     paymentTerms: ['T/T', 'L/C'],
     specifications: {
-      'Wireless': '2.4GHz + 5GHz',
-      'Ports': '4',
-      'Power': '10W',
-      'Certifications': 'CE, FCC, RoHS'
+      'Brand': 'MikroTik',
+      'Device Type': 'Router',
+      'Ports/Speed': '5x 10/100Mbps, 5x 10/100/1000Mbps',
+      'Wireless Standard': '2.4GHz + 5GHz',
+      'Coverage': 'Up to 100m²',
+      'Management': 'Web Interface',
+      'Other': 'PoE, Rackmount'
     },
     shippingMethods: ['Air Express', 'Sea Freight']
   },
@@ -1120,10 +1124,11 @@ export const SAMPLE_PRODUCTS: Product[] = [
     tradeTerms: ['CIF'],
     paymentTerms: ['T/T', 'PayPal'],
     specifications: {
-      'Ports': '24',
-      'Speed': '1000Mbps',
-      'Power': '100W',
-      'Certifications': 'CE, FCC, RoHS'
+      'Brand': 'TP-Link',
+      'Device Type': 'Switch',
+      'Ports/Speed': '8x 10/100/1000Mbps',
+      'Management': 'Web Interface',
+      'Other': 'Desktop, Plug & Play'
     },
     shippingMethods: ['Air Express', 'Sea Freight']
   },
@@ -1147,10 +1152,13 @@ export const SAMPLE_PRODUCTS: Product[] = [
     tradeTerms: ['FOB'],
     paymentTerms: ['T/T', 'L/C'],
     specifications: {
-      'Wireless': '2.4GHz + 5GHz',
-      'Ports': '4',
-      'Power': '10W',
-      'Certifications': 'CE, FCC, RoHS'
+      'Brand': 'D-Link',
+      'Device Type': 'Router',
+      'Ports/Speed': '4x 10/100Mbps LAN',
+      'Wireless Standard': 'AC1200',
+      'Coverage': 'Up to 120m²',
+      'Management': 'Web Interface',
+      'Other': 'Dual Band, 2x External Antennas'
     },
     shippingMethods: ['Air Express', 'Sea Freight']
   },

@@ -104,7 +104,7 @@
 }
 
 .product-card {
-  @apply bg-white rounded-lg border border-gray-200 overflow-hidden transition-all duration-300;
+  @apply bg-white rounded-lg border border-gray-200 overflow-hidden transition-all duration-300 w-full;
 }
 
 .product-card:hover {

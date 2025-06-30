@@ -9,7 +9,7 @@ interface Supplier {
   logo: string;
 }
 
-interface Message {
+export interface Message {
   id: number;
   sender: 'buyer' | 'supplier';
   text: string;
