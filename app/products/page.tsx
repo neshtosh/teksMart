@@ -1,5 +1,6 @@
 'use client';
 
+import { Search, X, Filter, ChevronRight, SlidersHorizontal } from 'lucide-react';
 import { useState, useMemo, useEffect } from 'react';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
@@ -8,6 +9,7 @@ import { ProductCard } from '@/components/ProductCard';
 import { SAMPLE_PRODUCTS, SUPPLIERS } from '@/lib/data';
 import { CATEGORIES } from '@/lib/constants';
 import { useSearchParams, useRouter } from 'next/navigation';
+import Link from 'next/link';
 import React from 'react';
 import type { Product, MOQTier } from '@/lib/types';
 
@@ -1416,7 +1418,7 @@ export default function ProductsPage() {
     gridContent = laptopsToShow.length === 0 ? (
       <div className="col-span-full text-center text-gray-500 text-xl font-medium py-24">No products found.</div>
     ) : (
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-5">
         {laptopsToShow.map(product => (
           <ProductCard key={product.id} product={product} />
                 ))}
@@ -1426,7 +1428,7 @@ export default function ProductsPage() {
     gridContent = cpusToShow.length === 0 ? (
       <div className="col-span-full text-center text-gray-500 text-xl font-medium py-24">No products found.</div>
     ) : (
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-5">
         {cpusToShow.map(product => (
           <ProductCard key={product.id} product={product} />
         ))}
@@ -1436,7 +1438,7 @@ export default function ProductsPage() {
     gridContent = productsToShow.length === 0 ? (
       <div className="col-span-full text-center text-gray-500 text-xl font-medium py-24">No products found.</div>
     ) : (
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-5">
         {productsToShow.map(product => (
           <ProductCard key={product.id} product={product} />
         ))}
@@ -1446,7 +1448,7 @@ export default function ProductsPage() {
     gridContent = tabletsToShow.length === 0 ? (
       <div className="col-span-full text-center text-gray-500 text-xl font-medium py-24">No products found.</div>
     ) : (
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-5">
         {tabletsToShow.map(product => (
           <ProductCard key={product.id} product={product} />
         ))}
@@ -1456,7 +1458,7 @@ export default function ProductsPage() {
     gridContent = accessoriesToShow.length === 0 ? (
       <div className="col-span-full text-center text-gray-500 text-xl font-medium py-24">No products found.</div>
     ) : (
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-5">
         {accessoriesToShow.map(product => (
           <ProductCard key={product.id} product={product} />
         ))}
@@ -1466,7 +1468,7 @@ export default function ProductsPage() {
     gridContent = networkHardwareToShow.length === 0 ? (
       <div className="col-span-full text-center text-gray-500 text-xl font-medium py-24">No products found.</div>
     ) : (
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-5">
         {networkHardwareToShow.map(product => (
           <ProductCard key={product.id} product={product} />
         ))}
@@ -1476,7 +1478,7 @@ export default function ProductsPage() {
     gridContent = productsToShow.length === 0 ? (
       <div className="col-span-full text-center text-gray-500 text-xl font-medium py-24">No products found.</div>
     ) : (
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-5">
         {productsToShow.map(product => (
           <ProductCard key={product.id} product={product} />
         ))}
@@ -1484,74 +1486,248 @@ export default function ProductsPage() {
     );
   }
 
+  // Count active filters for the current view
+  const countActiveFilters = useMemo(() => {
+    if (selectedCategory === 'mobile-phones') {
+      return (
+        (mobilePrice.min || mobilePrice.max ? 1 : 0) +
+        (mobilePriceBucket ? 1 : 0) +
+        Object.values(mobileFilters).reduce((sum, set) => sum + set.size, 0) +
+        (mobileBrand ? 1 : 0) +
+        (mobileSupplier ? 1 : 0)
+      );
+    }
+    // Add other category filter counts as needed
+    return 0;
+  }, [mobilePrice, mobilePriceBucket, mobileFilters, mobileBrand, mobileSupplier]);
+
+  // Function to clear all filters
+  const clearAllFilters = () => {
+    if (selectedCategory === 'mobile-phones') {
+      setMobilePrice({ min: '', max: '' });
+      setMobilePriceBucket('');
+      setMobileFilters({});
+      setMobileBrand('');
+      setMobileSupplier('');
+    }
+    // Add other category filter resets as needed
+  };
+
   return (
     <main className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
       <Header />
-      <div className="container-custom py-12">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
-          <div className="flex gap-4 items-center">
-            <select
-              className="rounded-lg border-blue-100 px-4 py-2 text-base"
-              value={selectedCategory}
-              onChange={e => {
-                setSelectedCategory(e.target.value);
-                setSelectedSubcategory('');
-                router.push(`/products?category=${e.target.value}`);
-              }}
-            >
-              <option value="">All Categories</option>
-              {CATEGORIES.map(cat => (
-                <option key={cat.id} value={cat.id}>{cat.name}</option>
-              ))}
-            </select>
-            {subcategories.length > 0 && (
+      <div className="container-custom py-6">
+        {/* Category Breadcrumbs */}
+        <div className="flex items-center text-sm text-gray-600 mb-6">
+          <Link href="/" className="hover:text-blue-600">Home</Link>
+          <ChevronRight className="h-4 w-4 mx-2 text-gray-400" />
+          <Link href="/products" className="hover:text-blue-600">Products</Link>
+          {selectedCategory && (
+            <>
+              <ChevronRight className="h-4 w-4 mx-2 text-gray-400" />
+              <span className="font-medium text-blue-600">
+                {CATEGORIES.find(c => c.id === selectedCategory)?.name || 'All Products'}
+              </span>
+            </>
+          )}
+          {selectedSubcategory && (
+            <>
+              <ChevronRight className="h-4 w-4 mx-2 text-gray-400" />
+              <span className="font-medium text-blue-600">
+                {subcategories.find(s => s.id === selectedSubcategory)?.name}
+              </span>
+            </>
+          )}
+        </div>
+
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-3">
+          <h1 className="text-xl md:text-2xl font-bold text-gray-900">
+            {selectedCategory 
+              ? CATEGORIES.find(c => c.id === selectedCategory)?.name + ' Products'
+              : 'All Products'}
+            {selectedSubcategory && ` - ${subcategories.find(s => s.id === selectedSubcategory)?.name}`}
+          </h1>
+          
+          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+            <div className="relative w-full sm:w-56">
+              <input
+                type="text"
+                placeholder="Search products..."
+                className="w-full rounded-lg border border-gray-300 pl-9 pr-3 py-1.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+              />
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+            </div>
+            
+            <div className="flex items-center gap-2">
               <select
-                className="rounded-lg border-blue-100 px-4 py-2 text-base"
-                value={selectedSubcategory}
-                onChange={e => setSelectedSubcategory(e.target.value)}
+                className="rounded-lg border border-gray-300 px-3 py-1.5 text-xs focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                value={selectedCategory}
+                onChange={e => {
+                  setSelectedCategory(e.target.value);
+                  setSelectedSubcategory('');
+                  router.push(`/products?category=${e.target.value}`);
+                }}
               >
-                <option value="">All Subcategories</option>
-                {subcategories.map(sub => (
-                  <option key={sub.id} value={sub.id}>{sub.name}</option>
+                <option value="">All Categories</option>
+                {CATEGORIES.map(cat => (
+                  <option key={cat.id} value={cat.id}>{cat.name}</option>
                 ))}
               </select>
-            )}
+              
+              {subcategories.length > 0 && (
+                <select
+                  className="rounded-lg border border-gray-300 px-3 py-1.5 text-xs focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                  value={selectedSubcategory}
+                  onChange={e => setSelectedSubcategory(e.target.value)}
+                >
+                  <option value="">All {CATEGORIES.find(c => c.id === selectedCategory)?.name || 'Products'}</option>
+                  {subcategories.map(sub => (
+                    <option key={sub.id} value={sub.id}>{sub.name}</option>
+                  ))}
+                </select>
+              )}
+            </div>
           </div>
         </div>
-        <div className="grid md:grid-cols-[18rem_1fr] gap-12 mb-8 items-start w-full">
-          {/* Sidebar for mobile-phones only */}
-          {selectedCategory === 'mobile-phones' && (
-            <aside className="w-full md:w-72 shrink-0 sticky top-28 self-start z-10">
-              <MobilePhonesSidebar />
+        <div className="flex flex-col lg:flex-row gap-4 w-full">
+          {/* Sidebar Toggle for Mobile */}
+          <div className="md:hidden flex justify-between items-center mb-4">
+            <button 
+              className="flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-700 bg-white px-4 py-2 rounded-lg border border-gray-200 shadow-sm"
+              onClick={() => document.getElementById('filters-sidebar')?.classList.toggle('hidden')}
+            >
+              <Filter className="h-4 w-4" />
+              Filters {countActiveFilters > 0 && `(${countActiveFilters})`}
+            </button>
+            <div className="text-sm text-gray-500">
+              {productsToShow.length} {productsToShow.length === 1 ? 'product' : 'products'} found
+            </div>
+          </div>
+
+          <div className="flex-1 flex flex-col md:flex-row gap-6">
+            {/* Sidebar */}
+            <aside 
+              id="filters-sidebar" 
+              className="hidden lg:block w-full lg:w-60 xl:w-64 shrink-0 bg-white rounded-lg shadow-sm border border-gray-100 p-4 lg:sticky lg:top-20 self-start transition-all duration-300 h-fit text-sm"
+            >
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-base font-semibold text-gray-900">Filters</h2>
+                {countActiveFilters > 0 && (
+                  <button 
+                    onClick={clearAllFilters}
+                    className="text-sm text-blue-600 hover:text-blue-700"
+                  >
+                    Clear all
+                  </button>
+                )}
+              </div>
+              
+              {/* Sidebar content based on selected category */}
+              {selectedCategory === 'mobile-phones' && <MobilePhonesSidebar />}
+              {selectedCategory === 'computers' && selectedSubcategory === 'laptops' && <LaptopsSidebar />}
+              {selectedCategory === 'computers' && selectedSubcategory === 'cpus' && <CPUsSidebar />}
+              {selectedCategory === 'computers' && selectedSubcategory === 'tablets' && <TabletsSidebar />}
+              {selectedCategory === 'computer-accessories' && selectedSubcategory && <AccessoriesSidebar />}
+              {selectedCategory === 'network-hardware' && selectedSubcategory && <NetworkHardwareSidebar />}
+              
+              {!selectedCategory && (
+                <div className="text-center text-gray-500 py-8">
+                  <p>Select a category to see available filters</p>
+                </div>
+              )}
             </aside>
-          )}
-          {selectedCategory === 'computers' && selectedSubcategory === 'laptops' && (
-            <aside className="w-full md:w-72 shrink-0 sticky top-28 self-start z-10">
-              <LaptopsSidebar />
-            </aside>
-          )}
-          {selectedCategory === 'computers' && selectedSubcategory === 'cpus' && (
-            <aside className="w-full md:w-72 shrink-0 sticky top-28 self-start z-10">
-              <CPUsSidebar />
-            </aside>
-          )}
-          {selectedCategory === 'computers' && selectedSubcategory === 'tablets' && (
-            <aside className="w-full md:w-72 shrink-0 sticky top-28 self-start z-10">
-              <TabletsSidebar />
-            </aside>
-          )}
-          {selectedCategory === 'computer-accessories' && selectedSubcategory && (
-            <aside className="w-full md:w-72 shrink-0 sticky top-28 self-start z-10">
-              <AccessoriesSidebar />
-            </aside>
-          )}
-          {selectedCategory === 'network-hardware' && selectedSubcategory && (
-            <aside className="w-full md:w-72 shrink-0 sticky top-28 self-start z-10">
-              <NetworkHardwareSidebar />
-            </aside>
-          )}
-          <div className="flex-1 min-w-0 w-full">
-            {gridContent}
+
+            {/* Main Content */}
+            <div className="flex-1 min-w-0">
+              {/* Active Filters */}
+              {countActiveFilters > 0 && (
+                <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-3 mb-4">
+                  <div className="flex flex-wrap gap-2">
+                    {selectedCategory === 'mobile-phones' && (
+                      <>
+                        {mobilePrice.min || mobilePrice.max ? (
+                          <div className="flex items-center gap-1.5 bg-blue-50 text-blue-700 text-xs px-2.5 py-1 rounded-full">
+                            <span>Price: {mobilePrice.min ? `KES ${mobilePrice.min}` : ''}{mobilePrice.min && mobilePrice.max ? ' - ' : ''}{mobilePrice.max ? `KES ${mobilePrice.max}` : ''}</span>
+                            <button 
+                              onClick={() => setMobilePrice({ min: '', max: '' })}
+                              className="text-blue-500 hover:text-blue-700"
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          </div>
+                        ) : null}
+                        
+                        {mobileBrand && (
+                          <div className="flex items-center gap-1.5 bg-blue-50 text-blue-700 text-xs px-2.5 py-1 rounded-full">
+                            <span>Brand: {mobileBrand}</span>
+                            <button 
+                              onClick={() => setMobileBrand('')}
+                              className="text-blue-500 hover:text-blue-700"
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          </div>
+                        )}
+                        
+                        {Object.entries(mobileFilters).map(([key, values]) => 
+                          Array.from(values).map(value => (
+                            <div key={`${key}-${value}`} className="flex items-center gap-2 bg-blue-50 text-blue-700 text-sm px-3 py-1.5 rounded-full">
+                              <span>{key}: {value}</span>
+                              <button 
+                                onClick={() => {
+                                  setMobileFilters(prev => {
+                                    const newFilters = { ...prev };
+                                    if (newFilters[key]) {
+                                      newFilters[key].delete(value);
+                                      if (newFilters[key].size === 0) {
+                                        delete newFilters[key];
+                                      }
+                                    }
+                                    return newFilters;
+                                  });
+                                }}
+                                className="text-blue-500 hover:text-blue-700"
+                              >
+                                <X className="h-3 w-3" />
+                              </button>
+                            </div>
+                          ))
+                        )}
+                      </>
+                    )}
+                  </div>
+                </div>
+              )}
+              
+              {/* Product Grid */}
+              <div className="w-full">
+                {gridContent}
+              </div>
+              
+              {/* Pagination */}
+              <div className="mt-10 flex justify-center">
+                <nav className="flex items-center gap-1">
+                  <button className="px-3 py-1.5 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 disabled:opacity-50">
+                    Previous
+                  </button>
+                  {[1, 2, 3, 4, 5].map(page => (
+                    <button 
+                      key={page}
+                      className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                        page === 1 
+                          ? 'bg-blue-600 text-white' 
+                          : 'text-gray-700 hover:bg-gray-100'
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  ))}
+                  <button className="px-3 py-1.5 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50">
+                    Next
+                  </button>
+                </nav>
+              </div>
+            </div>
           </div>
         </div>
       </div>

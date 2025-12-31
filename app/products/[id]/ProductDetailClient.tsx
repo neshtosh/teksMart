@@ -20,7 +20,7 @@ import { useCart } from '@/components/cart/CartContext';
 
 export default function ProductDetailClient({ product }: { product: any }) {
   const [showQuoteModal, setShowQuoteModal] = useState(false);
-  const [selectedQuantity, setSelectedQuantity] = useState(10);
+  const [selectedTier, setSelectedTier] = useState(0);
   const [showChat, setShowChat] = useState(false);
   const { toast } = useToast();
   const { addToCart } = useCart();
@@ -30,8 +30,8 @@ export default function ProductDetailClient({ product }: { product: any }) {
     { id: 2, sender: 'buyer' as 'buyer', text: 'I am interested in your product.', timestamp: '09:01' },
   ];
 
-  const currentTier = product.moqTiers.find((tier: any) => selectedQuantity >= tier.quantity) || product.moqTiers[0];
-  const totalPrice = currentTier.pricePerUnit * selectedQuantity;
+  const currentTier = product.moqTiers[selectedTier] || product.moqTiers[0];
+  const totalPrice = currentTier.pricePerUnit * currentTier.quantity;
 
   return (
     <main className="min-h-screen bg-gray-50">
@@ -91,11 +91,11 @@ export default function ProductDetailClient({ product }: { product: any }) {
                     <div
                       key={index}
                       className={`flex justify-between items-center p-3 rounded-lg border-2 cursor-pointer transition-colors ${
-                        selectedQuantity >= tier.quantity
-                          ? 'border-blue-400 bg-blue-50'
+                        selectedTier === index
+                          ? 'border-blue-400 bg-blue-50 ring-2 ring-blue-100'
                           : 'border-gray-200 hover:border-gray-300'
                       }`}
-                      onClick={() => setSelectedQuantity(tier.quantity)}
+                      onClick={() => setSelectedTier(index)}
                     >
                       <div>
                         <div className="font-medium">MOQ {tier.quantity.toLocaleString()} pcs</div>
@@ -114,8 +114,8 @@ export default function ProductDetailClient({ product }: { product: any }) {
                 </div>
                 <div className="mt-6 p-4 bg-gray-50 rounded-lg">
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-gray-600">Selected Quantity:</span>
-                    <span className="font-medium">{selectedQuantity.toLocaleString()} pcs</span>
+                    <span className="text-gray-600">Selected MOQ:</span>
+                    <span className="font-medium">{currentTier.quantity.toLocaleString()} pcs</span>
                   </div>
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-gray-600">Unit Price:</span>
@@ -142,7 +142,13 @@ export default function ProductDetailClient({ product }: { product: any }) {
                 <Button
                   variant="default"
                   size="lg"
-                  onClick={() => addToCart({ id: product.id, name: product.name, image: product.images[0], price: currentTier.pricePerUnit, quantity: selectedQuantity })}
+                  onClick={() => addToCart({ 
+                    id: product.id, 
+                    name: product.name, 
+                    image: product.images[0], 
+                    price: currentTier.pricePerUnit, 
+                    quantity: currentTier.quantity 
+                  })}
                   aria-label="Add to Cart"
                 >
                   <ShoppingCart className="h-5 w-5 mr-2" />
@@ -190,7 +196,7 @@ export default function ProductDetailClient({ product }: { product: any }) {
         isOpen={showQuoteModal}
         onClose={() => setShowQuoteModal(false)}
         product={product}
-        selectedQuantity={selectedQuantity}
+        selectedTier={currentTier}
       />
       <ChatModal
         isOpen={showChat}

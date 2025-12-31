@@ -1,7 +1,7 @@
 import { Header } from '@/components/Header';
 import { Hero } from '@/components/Hero';
 import { TrendingProducts } from '@/components/TrendingProducts';
-import { Categories } from '@/components/Categories';
+import { CategoriesClient } from '@/components/CategoriesClient';
 import { FinancingSection } from '@/components/FinancingSection';
 import { FloatingButtons } from '@/components/FloatingButtons';
 import { Footer } from '@/components/Footer';
@@ -12,7 +12,7 @@ export default function Home() {
       <Header />
       <Hero />
       <TrendingProducts />
-      <Categories />
+      <CategoriesClient />
       <FinancingSection />
       <Footer />
       <FloatingButtons />

@@ -22,13 +22,13 @@ interface QuoteRequestModalProps {
   isOpen: boolean;
   onClose: () => void;
   product: Product;
-  selectedQuantity: number;
+  selectedTier: any; // This should be the selected tier object
 }
 
-export function QuoteRequestModal({ isOpen, onClose, product, selectedQuantity }: QuoteRequestModalProps) {
+export function QuoteRequestModal({ isOpen, onClose, product, selectedTier }: QuoteRequestModalProps) {
   const { toast } = useToast();
   const [formData, setFormData] = useState({
-    quantity: selectedQuantity,
+    quantity: selectedTier?.quantity || 1,
     tradeTerm: '',
     targetPrice: '',
     maxBudget: '',
@@ -80,8 +80,8 @@ export function QuoteRequestModal({ isOpen, onClose, product, selectedQuantity }
     onClose();
   };
 
-  const currentTier = product.moqTiers.find(tier => formData.quantity >= tier.quantity) || product.moqTiers[0];
-  const estimatedTotal = currentTier.pricePerUnit * formData.quantity;
+  // Use the selected tier for calculations
+  const estimatedTotal = selectedTier ? selectedTier.pricePerUnit * selectedTier.quantity : 0;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -338,7 +338,7 @@ export function QuoteRequestModal({ isOpen, onClose, product, selectedQuantity }
                 </div>
                 <div className="flex justify-between">
                   <span>Unit Price (MOQ tier):</span>
-                  <span>KES {currentTier.pricePerUnit.toLocaleString()}</span>
+                  <span>KES {selectedTier?.pricePerUnit?.toLocaleString() || '0'}</span>
                 </div>
                 <div className="flex justify-between font-medium text-blue-900 pt-1 border-t border-blue-200">
                   <span>Estimated Total:</span>
